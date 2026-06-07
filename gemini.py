@@ -1,35 +1,38 @@
 import base64
 import requests
+import os
 
 # ------------------------------------------------------------
 # Configurações da API
 # ------------------------------------------------------------
-API_KEY = "AIzaSyCSVf_tbnq61rR4x2qYuh5KaBptKsFQqcU"
+API_KEY = os.environ.get("GEMINI_API_KEY")
 GEMINI_URL = (
     f"https://generativelanguage.googleapis.com/v1beta/"
     f"models/gemini-2.0-flash:generateContent?key={API_KEY}"
 )
 HEADERS = {"Content-Type": "application/json"}
 
-
 # ------------------------------------------------------------
 # monta e envia a requisição para o Gemini
 # ------------------------------------------------------------
 def _chamar_gemini(partes: list) -> str:
+    if not API_KEY:
+        raise Exception("Chave da API não configurada. Defina a variável GEMINI_API_KEY.")
+ 
     payload = {"contents": [{"parts": partes}]}
     response = requests.post(GEMINI_URL, json=payload, headers=HEADERS)
     dados = response.json()
-
+ 
     if not response.ok:
         msg = dados.get("error", {}).get("message", "Erro desconhecido")
         raise Exception(f"Gemini API erro: {msg}")
-
+ 
     candidatos = dados.get("candidates", [])
     if not candidatos:
         raise Exception("A IA não retornou nenhuma resposta.")
-
+ 
     return candidatos[0]["content"]["parts"][0]["text"].strip()
-
+ 
 
 # ------------------------------------------------------------
 # Utilitário interno: converte bytes para base64 string

@@ -1,16 +1,16 @@
 # ============================================================
-#  SnapTask — Backend Flask
 #  Este arquivo é o "servidor" da aplicação.
-#  Ele recebe as imagens/vídeos do frontend (HTML),
-#  repassa para o Gemini, e devolve a resposta.
 # ============================================================
 
 from flask import Flask, request, jsonify
+from dotenv import load_dotenv
 from flask_cors import CORS
-import gemini  # nosso arquivo gemini.py com a lógica da IA
+import gemini
+
+load_dotenv()
 
 app = Flask(__name__)
-CORS(app)  # Permite que o HTML (frontend) fale com esse servidor
+CORS(app)  # Conexao Frontend - servidor
 
 
 # ------------------------------------------------------------
