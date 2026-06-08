@@ -6,7 +6,7 @@ import random
 import os
 import io
 import base64
-import qrcode
+import segno
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 from flask_cors import CORS
@@ -23,11 +23,7 @@ CORS(app)  # Conexao Frontend - servidor
 # ------------------------------------------------------------
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-
-if not SUPABASE_URL or not SUPABASE_KEY:
-    print("⚠️ AVISO: SUPABASE_URL ou SUPABASE_KEY não configuradas no arquivo .env")
-else:
-    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # ------------------------------------------------------------
 #  Flashcards
@@ -111,39 +107,24 @@ def libras():
 @app.route("/gerar_qr", methods=["POST"])
 def gerar_qr():
     if "imagem" not in request.files:
-        return jsonify({"erro": "Nenhuma imagem enviada para compartilhar."}), 400
-
+        return jsonify({"erro": "Nenhuma imagem enviada."}), 400
+ 
     arquivo = request.files["imagem"]
     dados_imagem = arquivo.read()
-    
-    nome_remoto = f"snap_{random.randint(1000, 9999)}.jpg"
-
+    nome_remoto = f"snap_{random.randint(10000, 99999)}.jpg"
+ 
     try:
         supabase.storage.from_("fotos").upload(nome_remoto, dados_imagem)
-        
         link = supabase.storage.from_("fotos").get_public_url(nome_remoto)
-
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_H,
-            box_size=10,
-            border=2
-        )
-        qr.add_data(link)
-        qr.make(fit=True)
-
-        img = qr.make_image(fill_color="black", back_color="white")
+ 
+        qr = segno.make(link, error="h")
         buffer = io.BytesIO()
-        img.save(buffer, format="PNG")
+        qr.save(buffer, kind="png", scale=8)
         qr_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
-
-        return jsonify({
-            "link": link,
-            "qr_base64": qr_base64
-        })
-
+ 
+        return jsonify({"link": link, "qr_base64": qr_base64})
+ 
     except Exception as e:
-        print(f"Erro ao subir para o Supabase: {str(e)}")
         return jsonify({"erro": str(e)}), 500
 
 # ------------------------------------------------------------
