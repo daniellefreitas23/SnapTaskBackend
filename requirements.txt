@@ -3,6 +3,5 @@ flask-cors==5.0.1
 requests==2.32.3
 gunicorn==21.2.0
 python-dotenv==1.0.1
-qrcode==7.4.2
-pillow==11.2.1
+qrcode[pil]
 supabase==2.3.0
