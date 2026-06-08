@@ -4,4 +4,4 @@ requests==2.32.3
 gunicorn==21.2.0
 python-dotenv==1.0.1
 segno==1.6.1
-supabase==2.3.0
+supabase==2.15.1
