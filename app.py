@@ -3,6 +3,7 @@
 # ============================================================
 
 import random
+import os
 import io
 import base64
 import qrcode
@@ -10,12 +11,23 @@ from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 from flask_cors import CORS
 import gemini
+from supabase import create_client, Client
 
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)  # Conexao Frontend - servidor
 
+# ------------------------------------------------------------
+# Configurações da API
+# ------------------------------------------------------------
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    print("⚠️ AVISO: SUPABASE_URL ou SUPABASE_KEY não configuradas no arquivo .env")
+else:
+    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # ------------------------------------------------------------
 #  Flashcards
