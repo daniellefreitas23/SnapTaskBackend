@@ -2,6 +2,11 @@
 #  Este arquivo é o "servidor" da aplicação.
 # ============================================================
 
+import base64
+from io import BytesIO
+import random
+import string
+import qrcode
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 from flask_cors import CORS
@@ -88,6 +93,36 @@ def libras():
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
 
+# ------------------------------------------------------------
+# Qr Code
+# ------------------------------------------------------------
+@app.route("/gerar_qr", methods=["POST"])
+def gerar_qr():
+    # 1. Criamos um link fictício/estático local idêntico ao do seu mockup
+    hash_aleatorio = "".join(
+        random.choices(string.ascii_lowercase + string.digits, k=6)
+    )
+    link_ficticio = f"https://snap.link/share/{hash_aleatorio}"
+
+    try:
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_H,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(link_ficticio)
+        qr.make(fit=True)
+
+        img = qr.make_image(fill_color="black", back_color="white")
+        buffer = BytesIO()
+        img.save(buffer, format="PNG")
+        img_str = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+        return jsonify({"link": link_ficticio, "qr_base64": img_str})
+
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
 
 # ------------------------------------------------------------
 # Inicia o servidor na porta 5000
