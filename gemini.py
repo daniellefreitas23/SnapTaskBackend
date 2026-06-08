@@ -149,8 +149,12 @@ def traduzir_libras(dados_video: bytes, mime_type: str) -> str:
     partes = [
         {
             "text": (
-                "Transcreva o sinal de Libras realizado neste vídeo para texto em português. "
-                "Se for uma frase ou várias letras, escreva o texto completo."
+                "Observe este vídeo com linguagem de sinais (Libras). "
+                "Retorne APENAS o texto traduzido em português, de forma direta e simples. "
+                "Se for uma palavra, retorne só a palavra. "
+                "Se for uma frase, retorne só a frase. "
+                "Se não reconhecer o sinal, retorne: 'Sinal não reconhecido'. "
+                "Não adicione explicações, não use aspas, não descreva o vídeo."
             )
         },
         {
@@ -160,5 +164,4 @@ def traduzir_libras(dados_video: bytes, mime_type: str) -> str:
             }
         },
     ]
-
     return _chamar_gemini(partes)
