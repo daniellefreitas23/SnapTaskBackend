@@ -148,17 +148,20 @@ def ler_codigo(dados_imagem: bytes, mime_type: str) -> dict:
 def traduzir_libras(dados_video: bytes, mime_type: str) -> str:
     partes = [
         {
-            "text": (
-                "Observe este vídeo com linguagem de sinais (Libras). "
-                "Transcreva TUDO que foi sinalizado, sem resumir, sem omitir nada. "
-                "Se forem letras do alfabeto, retorne cada letra na ordem. "
-                "Se for uma palavra, retorne a palavra completa. "
-                "Se for uma frase, retorne a frase completa. "
-                "Se for uma música, retorne a letra completa como foi sinalizada. "
-                "Se for uma ação ou gesto descritivo, retorne a ação em português. "
-                "Se houver múltiplos sinais, retorne todos em sequência. "
-                "Retorne APENAS a transcrição, sem explicações, sem aspas, sem comentários."
-            )
+            "text": """Você é um tradutor e intérprete especialista em Língua Brasileira de Sinais (Libras). Sua tarefa é assistir ao vídeo fornecido e realizar uma transcrição literal e detalhada de tudo o que é sinalizado.
+
+    Siga rigorosamente as seguintes regras de transcrição:
+    1. TRANSCREVA TUDO: Não resuma, não omita e não pule nenhum trecho.
+    2. ALFABETO RESTRITO (Dactilologia): Se forem letras isoladas do alfabeto, retorne cada letra na ordem exata em que foi soletrada (ex: C-A-S-A).
+    3. PALAVRAS E FRASES: Se for uma palavra ou frase, retorne-a completa e corrigida para a estrutura gramatical do português, mantendo o sentido exato do sinal.
+    4. MÚSICAS: Se o vídeo for uma interpretação musical, retorne a letra completa da música exatamente como foi sinalizada.
+    5. SINAIS DESCRITIVOS/CLASSIFICADORES: Se houver uma ação, expressão facial gramatical ou gesto descritivo sem palavra direta, descreva a ação em português entre colchetes (ex: [acenando com raiva], [indicando um objeto grande]).
+    6. SEQUÊNCIA: Se houver múltiplos sinais em sequência, mantenha a ordem cronológica exata do vídeo.
+
+    DIRETRIZ DE FORMATAÇÃO (CRÍTICA):
+    - Retorne APENAS a transcrição final.
+    - Não inclua explicações, introduções, saudações, comentários ou notas de rodapé.
+    - Não use aspas no texto final."""
         },
         {
             "inline_data": {
