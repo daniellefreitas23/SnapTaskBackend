@@ -150,11 +150,14 @@ def traduzir_libras(dados_video: bytes, mime_type: str) -> str:
         {
             "text": (
                 "Observe este vídeo com linguagem de sinais (Libras). "
-                "Retorne APENAS o texto traduzido em português, de forma direta e simples. "
-                "Se for uma palavra, retorne só a palavra. "
-                "Se for uma frase, retorne só a frase. "
-                "Se não reconhecer o sinal, retorne: 'Sinal não reconhecido'. "
-                "Não adicione explicações, não use aspas, não descreva o vídeo."
+                "Transcreva TUDO que foi sinalizado, sem resumir, sem omitir nada. "
+                "Se forem letras do alfabeto, retorne cada letra na ordem. "
+                "Se for uma palavra, retorne a palavra completa. "
+                "Se for uma frase, retorne a frase completa. "
+                "Se for uma música, retorne a letra completa como foi sinalizada. "
+                "Se for uma ação ou gesto descritivo, retorne a ação em português. "
+                "Se houver múltiplos sinais, retorne todos em sequência. "
+                "Retorne APENAS a transcrição, sem explicações, sem aspas, sem comentários."
             )
         },
         {
