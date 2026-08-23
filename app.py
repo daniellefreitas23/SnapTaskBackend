@@ -26,6 +26,29 @@ SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # ------------------------------------------------------------
+# Ping para não ibernar
+# ------------------------------------------------------------
+@app.route("/ping", methods=["GET"])
+def ping():
+    try:
+        supabase.storage.list_buckets()
+        return jsonify({"status": "ok"})
+    except:
+        return jsonify({"status": "ok"})
+
+
+# ------------------------------------------------------------
+# Não ibernar supabase
+# ------------------------------------------------------------
+@app.route("/ping", methods=["GET"])
+def ping():
+    try:
+        supabase.storage.list_buckets()
+        return jsonify({"status": "ok"})
+    except:
+        return jsonify({"status": "ok"})
+
+# ------------------------------------------------------------
 #  Flashcards
 # ------------------------------------------------------------
 @app.route("/flashcards", methods=["POST"])
