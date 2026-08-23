@@ -37,17 +37,6 @@ def ping():
         return jsonify({"status": "ok"})
 
 # ------------------------------------------------------------
-# Não ibernar supabase
-# ------------------------------------------------------------
-@app.route("/ping", methods=["GET"])
-def ping():
-    try:
-        supabase.storage.list_buckets()
-        return jsonify({"status": "ok"})
-    except:
-        return jsonify({"status": "ok"})
-
-# ------------------------------------------------------------
 #  Flashcards
 # ------------------------------------------------------------
 @app.route("/flashcards", methods=["POST"])
