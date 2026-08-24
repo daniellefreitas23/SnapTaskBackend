@@ -17,6 +17,44 @@ load_dotenv()
 
 app = Flask(__name__)
 CORS(app)  # Conexao Frontend - servidor
+app.config["MAX_CONTENT_LENGTH"] = 20 * 1024 * 1024
+
+TIPOS_GEMINI = {
+    "application/pdf",
+    "text/plain",
+    "text/csv",
+    "text/markdown",
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/heic",
+    "image/heif",
+    "video/mp4",
+    "video/mpeg",
+    "video/mov",
+    "video/avi",
+    "video/x-flv",
+    "video/mpg",
+    "video/webm",
+    "video/wmv",
+    "video/3gpp",
+}
+
+
+def _receber_arquivo(*nomes):
+    arquivo = next((request.files.get(nome) for nome in nomes if request.files.get(nome)), None)
+    if arquivo is None or not arquivo.filename:
+        raise ValueError("Nenhum arquivo enviado. Use o campo multipart 'arquivo'.")
+
+    dados = arquivo.read()
+    if not dados:
+        raise ValueError("O arquivo enviado está vazio.")
+
+    mime_type = arquivo.mimetype or "application/octet-stream"
+    if mime_type not in TIPOS_GEMINI:
+        raise ValueError(f"Formato não suportado: {mime_type}.")
+
+    return arquivo, dados, mime_type
 
 # ------------------------------------------------------------
 # Configurações da API
