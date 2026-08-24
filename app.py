@@ -119,10 +119,19 @@ def documento():
 # ------------------------------------------------------------
 @app.route("/codigo", methods=["POST"])
 def codigo():
-    if "imagem" not in request.files:
-        return jsonify({"erro": "Nenhuma imagem enviada."}), 400
-
+    codigo_original = request.form.get("codigo", "").strip()
     prompt = request.form.get("prompt", "").strip()
+
+    if codigo_original:
+        try:
+            resultado = gemini.melhorar_codigo(codigo_original, prompt)
+            return jsonify({"codigo_melhorado": resultado})
+        except Exception as e:
+            return jsonify({"erro": str(e)}), 500
+
+    if "imagem" not in request.files:
+        return jsonify({"erro": "Envie uma imagem ou um código."}), 400
+
     arquivo = request.files["imagem"]
     dados_imagem = arquivo.read()
     mime_type = arquivo.mimetype or "image/jpeg"

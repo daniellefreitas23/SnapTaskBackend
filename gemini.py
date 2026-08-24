@@ -145,6 +145,24 @@ def ler_codigo(dados_imagem: bytes, mime_type: str, prompt: str = "") -> dict:
     }
 
 
+def melhorar_codigo(codigo_original: str, prompt: str = "", linguagem: str = "Não informada") -> str:
+    partes = [
+        {
+            "text": f"""Analise o código abaixo e sugira melhorias.
+Mantenha o comportamento original.
+Retorne somente o código melhorado, sem markdown ou explicações.
+
+Linguagem: {linguagem}
+Solicitação: {prompt or "Nenhuma"}
+
+Código original:
+{codigo_original}"""
+        }
+    ]
+
+    return _chamar_gemini(partes)
+
+
 # ============================================================
 #  TRADUTOR DE LIBRAS
 # ============================================================
