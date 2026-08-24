@@ -44,11 +44,12 @@ def _para_base64(dados: bytes) -> str:
 # ============================================================
 #  FLASHCARDS
 # ============================================================
-def gerar_flashcards(dados_imagem: bytes, mime_type: str) -> list:
+def gerar_flashcards(dados_imagem: bytes, mime_type: str, prompt: str = "") -> list:
     partes = [
         {
             "text": (
-                "Crie 3 flashcards sobre a imagem. "
+                f"Crie 3 flashcards sobre a imagem.\n"
+                f"Instrução adicional do usuário: {prompt or 'Nenhuma'}\n"
                 "Retorne APENAS no formato: P: [pergunta] R: [resposta]. "
                 "Não use mais nenhuma palavra."
             )
@@ -80,11 +81,12 @@ def gerar_flashcards(dados_imagem: bytes, mime_type: str) -> list:
 # ============================================================
 #  EDITOR DE DOCUMENTO
 # ============================================================
-def gerar_documento(dados_imagem: bytes, mime_type: str) -> str:
+def gerar_documento(dados_imagem: bytes, mime_type: str, prompt: str = "") -> str:
     partes = [
         {
             "text": (
-                "Transcreva todo o texto presente nesta imagem de forma clara e organizada. "
+                f"Transcreva todo o texto presente nesta imagem de forma clara e organizada.\n"
+                f"Instrução adicional do usuário: {prompt or 'Nenhuma'}\n"
                 "Corrija eventuais erros de digitação ou leitura. "
                 "Retorne APENAS o texto transcrito, sem comentários adicionais."
             )
@@ -103,11 +105,12 @@ def gerar_documento(dados_imagem: bytes, mime_type: str) -> str:
 # ============================================================
 #  LEITOR DE CÓDIGO
 # ============================================================
-def ler_codigo(dados_imagem: bytes, mime_type: str) -> dict:
+def ler_codigo(dados_imagem: bytes, mime_type: str, prompt: str = "") -> dict:
     partes = [
         {
             "text": (
-                "Identifique a linguagem e extraia o código desta imagem. "
+                f"Identifique a linguagem e extraia o código desta imagem.\n"
+                f"Instrução adicional do usuário: {prompt or 'Nenhuma'}\n"
                 "Retorne APENAS no seguinte formato:\n"
                 "LINGUAGEM: [nome da linguagem]\n"
                 "CODIGO:\n[código perfeitamente indentado]\n"
@@ -145,10 +148,18 @@ def ler_codigo(dados_imagem: bytes, mime_type: str) -> dict:
 # ============================================================
 #  TRADUTOR DE LIBRAS
 # ============================================================
-def traduzir_libras(dados_video: bytes, mime_type: str) -> str:
+def traduzir_libras(
+    dados_video: bytes,
+    mime_type: str,
+    prompt: str = "",
+    categoria: str = "",
+) -> str:
     partes = [
         {
-            "text": """Você é um tradutor e intérprete especialista em Língua Brasileira de Sinais (Libras). Sua tarefa é assistir ao vídeo fornecido e realizar uma transcrição literal e detalhada de tudo o que é sinalizado.
+                "text": f"""Você é um tradutor e intérprete especialista em Língua Brasileira de Sinais (Libras). Sua tarefa é assistir ao vídeo fornecido e realizar uma transcrição literal e detalhada de tudo o que é sinalizado.
+
+            Instrução adicional do usuário: {prompt or "Nenhuma"}
+            Categoria selecionada: {categoria or "Não informada"}
 
     Siga rigorosamente as seguintes regras de transcrição:
     1. TRANSCREVA TUDO: Não resuma, não omita e não pule nenhum trecho.

@@ -16,7 +16,7 @@ from supabase import create_client, Client
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)  # Conexao Frontend - servidor
+CORS(app, origins=os.environ.get("FRONTEND_ORIGIN", "*"))
 app.config["MAX_CONTENT_LENGTH"] = 20 * 1024 * 1024
 
 TIPOS_GEMINI = {
@@ -82,12 +82,13 @@ def flashcards():
     if "imagem" not in request.files:
         return jsonify({"erro": "Nenhuma imagem enviada."}), 400
 
+    prompt = request.form.get("prompt", "").strip()
     arquivo = request.files["imagem"]
     dados_imagem = arquivo.read()
     mime_type = arquivo.mimetype or "image/jpeg"
 
     try:
-        cards = gemini.gerar_flashcards(dados_imagem, mime_type)
+        cards = gemini.gerar_flashcards(dados_imagem, mime_type, prompt)
         return jsonify({"cards": cards})
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
@@ -101,12 +102,13 @@ def documento():
     if "imagem" not in request.files:
         return jsonify({"erro": "Nenhuma imagem enviada."}), 400
 
+    prompt = request.form.get("prompt", "").strip()
     arquivo = request.files["imagem"]
     dados_imagem = arquivo.read()
     mime_type = arquivo.mimetype or "image/jpeg"
 
     try:
-        texto = gemini.gerar_documento(dados_imagem, mime_type)
+        texto = gemini.gerar_documento(dados_imagem, mime_type, prompt)
         return jsonify({"texto": texto})
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
@@ -120,12 +122,13 @@ def codigo():
     if "imagem" not in request.files:
         return jsonify({"erro": "Nenhuma imagem enviada."}), 400
 
+    prompt = request.form.get("prompt", "").strip()
     arquivo = request.files["imagem"]
     dados_imagem = arquivo.read()
     mime_type = arquivo.mimetype or "image/jpeg"
 
     try:
-        resultado = gemini.ler_codigo(dados_imagem, mime_type)
+        resultado = gemini.ler_codigo(dados_imagem, mime_type, prompt)
         return jsonify(resultado)
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
@@ -139,12 +142,25 @@ def libras():
     if "video" not in request.files:
         return jsonify({"erro": "Nenhum vídeo enviado."}), 400
 
+    prompt = request.form.get("prompt", "").strip()
+    categoria = request.form.get("categoria", "").strip()
+    categorias_validas = {
+        "Abecedário",
+        "Música",
+        "Ação",
+        "Escrever",
+        "Saudações",
+        "Números",
+    }
+    if categoria not in categorias_validas:
+        categoria = ""
+
     arquivo = request.files["video"]
     dados_video = arquivo.read()
     mime_type = arquivo.mimetype or "video/mp4"
 
     try:
-        traducao = gemini.traduzir_libras(dados_video, mime_type)
+        traducao = gemini.traduzir_libras(dados_video, mime_type, prompt, categoria)
         return jsonify({"traducao": traducao})
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
