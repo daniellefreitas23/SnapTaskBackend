@@ -1,4 +1,5 @@
 import base64
+import json
 import requests
 import os
 
@@ -41,6 +42,14 @@ def _para_base64(dados: bytes) -> str:
     return base64.b64encode(dados).decode("utf-8")
 
 
+def _ler_json_resposta(texto: str) -> dict:
+    texto = texto.strip()
+    if texto.startswith("```"):
+        linhas = texto.splitlines()
+        texto = "\n".join(linhas[1:-1]).strip()
+    return json.loads(texto)
+
+
 # ============================================================
 #  FLASHCARDS
 # ============================================================
@@ -78,6 +87,20 @@ def gerar_flashcards(dados_imagem: bytes, mime_type: str, prompt: str = "") -> l
     return cards
 
 
+def gerar_flashcards_texto(texto: str, prompt: str = "") -> list:
+    partes = [{
+        "text": f"""Crie 3 flashcards com base no texto abaixo.
+Instrução adicional do usuário: {prompt or "Nenhuma"}
+Retorne somente JSON válido no formato:
+{{"cards": [{{"frente": "Pergunta", "verso": "Resposta"}}]}}
+
+Texto:
+{texto}"""
+    }]
+    resposta = _ler_json_resposta(_chamar_gemini(partes))
+    return resposta["cards"]
+
+
 # ============================================================
 #  EDITOR DE DOCUMENTO
 # ============================================================
@@ -100,6 +123,26 @@ def gerar_documento(dados_imagem: bytes, mime_type: str, prompt: str = "") -> st
     ]
 
     return _chamar_gemini(partes)
+
+
+def melhorar_documento(texto: str, prompt: str = "") -> dict:
+    partes = [{
+        "text": f"""Melhore o documento abaixo.
+Mantenha as informações originais.
+Retorne JSON válido com:
+- texto: documento melhorado
+- comentario: explicação do que foi melhorado
+
+Solicitação:
+{prompt}
+
+Documento original:
+{texto}"""
+    }]
+    resultado = _ler_json_resposta(_chamar_gemini(partes))
+    if not isinstance(resultado.get("texto"), str) or not isinstance(resultado.get("comentario"), str):
+        raise ValueError("A IA não retornou texto e comentario válidos.")
+    return resultado
 
 
 # ============================================================
@@ -145,15 +188,15 @@ def ler_codigo(dados_imagem: bytes, mime_type: str, prompt: str = "") -> dict:
     }
 
 
-def melhorar_codigo(codigo_original: str, prompt: str = "", linguagem: str = "Não informada") -> str:
+def melhorar_codigo(codigo_original: str, prompt: str = "") -> str:
     partes = [
         {
-            "text": f"""Analise o código abaixo e sugira melhorias.
+            "text": f"""Melhore o código abaixo.
 Mantenha o comportamento original.
-Retorne somente o código melhorado, sem markdown ou explicações.
+Retorne somente o código, sem explicações ou markdown.
 
-Linguagem: {linguagem}
-Solicitação: {prompt or "Nenhuma"}
+Solicitação:
+{prompt}
 
 Código original:
 {codigo_original}"""

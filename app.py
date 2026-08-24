@@ -79,17 +79,22 @@ def ping():
 # ------------------------------------------------------------
 @app.route("/flashcards", methods=["POST"])
 def flashcards():
-    if "imagem" not in request.files:
-        return jsonify({"erro": "Nenhuma imagem enviada."}), 400
-
+    imagem = request.files.get("imagem")
+    texto = request.form.get("texto", "").strip()
     prompt = request.form.get("prompt", "").strip()
-    arquivo = request.files["imagem"]
-    dados_imagem = arquivo.read()
-    mime_type = arquivo.mimetype or "image/jpeg"
 
     try:
-        cards = gemini.gerar_flashcards(dados_imagem, mime_type, prompt)
-        return jsonify({"cards": cards})
+        if texto:
+            cards = gemini.gerar_flashcards_texto(texto, prompt)
+            return jsonify({"cards": cards})
+
+        if imagem:
+            dados_imagem = imagem.read()
+            mime_type = imagem.mimetype or "image/jpeg"
+            cards = gemini.gerar_flashcards(dados_imagem, mime_type, prompt)
+            return jsonify({"cards": cards})
+
+        return jsonify({"erro": "Envie uma imagem ou texto."}), 400
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
 
@@ -99,17 +104,25 @@ def flashcards():
 # ------------------------------------------------------------
 @app.route("/documento", methods=["POST"])
 def documento():
-    if "imagem" not in request.files:
-        return jsonify({"erro": "Nenhuma imagem enviada."}), 400
-
+    imagem = request.files.get("imagem")
+    texto = request.form.get("texto", "").strip()
     prompt = request.form.get("prompt", "").strip()
-    arquivo = request.files["imagem"]
-    dados_imagem = arquivo.read()
-    mime_type = arquivo.mimetype or "image/jpeg"
 
     try:
-        texto = gemini.gerar_documento(dados_imagem, mime_type, prompt)
-        return jsonify({"texto": texto})
+        if texto:
+            resultado = gemini.melhorar_documento(texto, prompt)
+            return jsonify({
+                "texto": resultado["texto"],
+                "comentario": resultado["comentario"],
+            })
+
+        if imagem:
+            dados_imagem = imagem.read()
+            mime_type = imagem.mimetype or "image/jpeg"
+            resultado = gemini.gerar_documento(dados_imagem, mime_type, prompt)
+            return jsonify({"texto": resultado})
+
+        return jsonify({"erro": "Envie uma imagem ou texto."}), 400
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
 
@@ -119,6 +132,7 @@ def documento():
 # ------------------------------------------------------------
 @app.route("/codigo", methods=["POST"])
 def codigo():
+    imagem = request.files.get("imagem")
     codigo_original = request.form.get("codigo", "").strip()
     prompt = request.form.get("prompt", "").strip()
 
@@ -129,18 +143,17 @@ def codigo():
         except Exception as e:
             return jsonify({"erro": str(e)}), 500
 
-    if "imagem" not in request.files:
-        return jsonify({"erro": "Envie uma imagem ou um código."}), 400
+    if imagem:
+        dados_imagem = imagem.read()
+        mime_type = imagem.mimetype or "image/jpeg"
 
-    arquivo = request.files["imagem"]
-    dados_imagem = arquivo.read()
-    mime_type = arquivo.mimetype or "image/jpeg"
+        try:
+            resultado = gemini.ler_codigo(dados_imagem, mime_type, prompt)
+            return jsonify(resultado)
+        except Exception as e:
+            return jsonify({"erro": str(e)}), 500
 
-    try:
-        resultado = gemini.ler_codigo(dados_imagem, mime_type, prompt)
-        return jsonify(resultado)
-    except Exception as e:
-        return jsonify({"erro": str(e)}), 500
+    return jsonify({"erro": "Nenhuma imagem enviada."}), 400
 
 
 # ------------------------------------------------------------
